@@ -8,22 +8,29 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // Don't assume columns — grab everything
-    const { results } = await env.DB.prepare(`SELECT * FROM themes`).all();
+    // Return columns exactly as they exist in D1
+    const { results } = await env.DB.prepare(`
+      SELECT
+        slug,
+        brand_name,
+        logo_path,
+        favicon_path,
+        status,
+        color_primary,
+        color_accent,
+        color_text,
+        color_muted,
+        color_border,
+        color_button_text,
+        header_bg,
+        email,
+        notes_internal,
+        updated_at
+      FROM themes
+      ORDER BY brand_name
+    `).all();
 
-    // Normalize shape for the UI/API
-    const items = (results || []).map((r: any) => ({
-      id: r.id ?? r.slug_id ?? r.theme_id ?? r.name,   // best-effort identifier
-      name: r.name ?? r.display_name ?? r.slug_id ?? r.id,
-      current_version: r.current_version ?? 1,
-      primary_color: r.primary_color ?? null,
-      secondary_color: r.secondary_color ?? null,
-      email_from_name: r.email_from_name ?? null,
-      email_from_address: r.email_from_address ?? null,
-      updated_at: r.updated_at ?? null
-    }));
-
-    return new Response(JSON.stringify(items), {
+    return new Response(JSON.stringify(results ?? []), {
       headers: { "content-type": "application/json" }
     });
   } catch (err: any) {
