@@ -1,4 +1,4 @@
-import { getCookie, verifyJWT } from "../../../_utils/auth";
+import { getCookie, verifyJWT } from "../../_utils/auth";
 
 export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   const token = getCookie(request, env.COOKIE_NAME);
