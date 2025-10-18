@@ -91,6 +91,49 @@ function renderThemesTable() {
     tr.querySelector("button").addEventListener("click", () => openEditor(t, false));
     tbody.appendChild(tr);
   }
+
+  function normHex(v) {
+  if (!v) return "";
+  let s = v.trim();
+  if (s[0] !== "#") s = "#" + s;
+  s = s.toUpperCase();
+  if (!/^#[0-9A-F]{3}([0-9A-F]{3})?$/.test(s)) return "";
+  // expand #ABC to #AABBCC for color input
+  if (s.length === 4) s = "#" + [...s.slice(1)].map(c => c + c).join("");
+  return s;
+}
+
+function tintInput(el, value) {
+  const hex = normHex(value);
+  el.style.background = hex || "";
+  el.style.color = hex ? (luma(hex) > 180 ? "#111827" : "#FFFFFF") : "";
+}
+function luma(hex) {
+  const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16);
+  return 0.2126*r + 0.7152*g + 0.0722*b;
+}
+
+/** link a text hex field with a color picker, keep both in sync and tint bg */
+function wireColor(textId, pickerId) {
+  const t = $(textId), p = $(pickerId);
+  // text → picker + tint
+  t.addEventListener("input", () => {
+    const hex = normHex(t.value);
+    if (hex) p.value = hex;
+    tintInput(t, hex);
+  });
+  // picker → text + tint
+  p.addEventListener("input", () => {
+    const hex = normHex(p.value);
+    t.value = hex;
+    tintInput(t, hex);
+  });
+  // initialize on load
+  const start = normHex(t.value || p.value);
+  if (start) { t.value = start; p.value = start; }
+  tintInput(t, start);
+}
+
 }
 
 // ---- editor ----------------------------------------------------
