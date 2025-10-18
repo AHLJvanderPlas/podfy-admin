@@ -9,7 +9,16 @@ export function setCookie(name: string, value: string, domain: string, maxAge: n
   return `${name}=${value}; HttpOnly; Secure; SameSite=Strict; Path=/; Domain=${domain}; Max-Age=${maxAge}`;
 }
 
+/** Ensure a non-empty secret is present; throw a helpful error otherwise. */
+function ensureSecret(secret: string | undefined) {
+  if (!secret || !secret.length) {
+    throw new Error("JWT_SECRET is not set. Add it as a Secret in Pages → Settings.");
+  }
+  return secret;
+}
+
 export async function signJWT(payload: JWTPayload, secret: string, expSec: number) {
+  secret = ensureSecret(secret);
   const now = Math.floor(Date.now() / 1000);
   const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
   const body   = base64url(JSON.stringify({ iat: now, exp: now + expSec, ...payload }));
@@ -22,29 +31,25 @@ export async function signJWT(payload: JWTPayload, secret: string, expSec: numbe
 }
 
 export async function verifyJWT(token: string, secret: string) {
+  secret = ensureSecret(secret);
   try {
     const [h, b, s] = token.split(".");
     if (!h || !b || !s) return null;
-
     const data = `${h}.${b}`;
-    const key = await crypto.subtle.importKey("raw", enc(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
 
-    // ✅ Correct arg order: verify(alg, key, signatureBytes, dataBytes)
-    const sigBytes = b64urlToUint8(s);
-    const ok = await crypto.subtle.verify("HMAC", key, sigBytes, enc(data));
+    const key = await crypto.subtle.importKey("raw", enc(secret), { name: "HMAC", hash: "SHA-256" }, false, ["verify"]);
+    const ok = await crypto.subtle.verify("HMAC", key, b64urlToUint8(s), enc(data));
     if (!ok) return null;
 
-    // ✅ Proper base64url decode of body
-    const bodyJson = b64urlToString(b);
-    const body = JSON.parse(bodyJson);
-    if (body.exp && Math.floor(Date.now() / 1000) > body.exp) return null;
+    const body = JSON.parse(b64urlToString(b));
+    if (body.exp && Math.floor(Date.now()/1000) > body.exp) return null;
     return body; // { sub, role, is_active, ... }
   } catch {
     return null;
   }
 }
 
-/* --- helpers --- */
+/* ---------- helpers ---------- */
 const enc = (s: string) => new TextEncoder().encode(s);
 
 function base64url(s: string) {
