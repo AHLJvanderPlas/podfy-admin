@@ -18,8 +18,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, env, params })
 
     const body = await request.json<any>().catch(() => ({}));
 
-    // Accept both UI keys and legacy keys; map to DB columns.
-    // Only include fields that are present (!== undefined).
+    // Accept both UI keys and legacy keys; map to current DB columns.
     const incoming: Record<string, any> = {
       brand_name: body.brand_name ?? body.name,
       logo_path: body.logo_path,
@@ -48,37 +47,27 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, env, params })
     const setSql = updates.map(([k]) => `${k}=?`).join(", ");
     const values = updates.map(([, v]) => v);
 
+    // Strict UPDATE; if slug not found, return 404.
     const sql = `
       UPDATE themes
          SET ${setSql}, updated_at=CURRENT_TIMESTAMP
-       WHERE slug=?
-    `;
-
+       WHERE slug=?`;
     const res = await env.DB.prepare(sql).bind(...values, slug).run();
 
-    // Optional: insert if not found (upsert-on-PUT). Comment out if you prefer strict update.
-    if (res.meta.changes === 0) {
-      // create a minimal row with provided values + slug
-      const cols = ["slug", ...updates.map(([k]) => k), "updated_at"];
-      const placeholders = cols.map(() => "?");
-      const insertVals = [slug, ...values, new Date().toISOString()];
-      const insertSql = `
-        INSERT INTO themes (${cols.join(", ")})
-        VALUES (${placeholders.join(", ")})
-      `;
-      await env.DB.prepare(insertSql).bind(...insertVals).run();
+    if ((res.meta?.changes ?? 0) === 0) {
+      return new Response("Not found", { status: 404 });
     }
 
+    // Audit
     await env.DB.prepare(
       `INSERT INTO audit_log (actor_user_id, action, target, payload)
        VALUES (?, 'theme.update', ?, ?)`
-    )
-      .bind(admin.sub, slug, JSON.stringify(incoming))
-      .run();
+    ).bind(admin.sub, slug, JSON.stringify(incoming)).run();
 
     return new Response(null, { status: 204 });
   } catch (e: any) {
-    // Always return JSON so the UI doesn’t render the HTML error page
+    // Ensure JSON, not HTML, so the UI shows a clear message
+    console.error("PUT /themes/:slug error:", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { "content-type": "application/json" },
