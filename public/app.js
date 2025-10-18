@@ -160,6 +160,15 @@ function openEditor(t, creating) {
   $("f-notes_internal").value = current.notes_internal || "";
   $("save-status").textContent = "";
   setHidden($("edit-modal"), false);
+
+// after setting f-color_* values:
+wireColor("f-color_primary", "p-color_primary");
+wireColor("f-color_accent", "p-color_accent");
+wireColor("f-color_text", "p-color_text");
+wireColor("f-color_muted", "p-color_muted");
+wireColor("f-color_border", "p-color_border");
+wireColor("f-color_button_text", "p-color_button_text");
+
 }
 
 async function saveEdits(e) {
