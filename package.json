@@ -1,0 +1,12 @@
+{
+  "name": "admin.podfy-site",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler pages dev ./public --compatibility-date=2025-10-18",
+    "deploy": "echo 'Deploy via Git push to Cloudflare Pages'",
+    "migrate:apply": "wrangler d1 migrations apply podfy-db"
+  },
+  "devDependencies": {
+    "wrangler": "3.78.10"
+  }
+}
