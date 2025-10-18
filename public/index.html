@@ -42,28 +42,36 @@
       </section>
 
       <!-- Themes List -->
-      <section id="view-themes" class="hidden">
-        <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-xl font-semibold">Themes</h2>
-          <div class="text-sm text-slate-500" id="theme-count"></div>
-        </div>
+<section id="view-themes" class="hidden">
+  <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <h2 class="text-xl font-semibold">Themes</h2>
 
-        <div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
-          <table class="min-w-full text-sm" id="themes-table">
-            <thead class="bg-slate-50 text-left">
-              <tr>
-                <th class="p-3">Slug</th>
-                <th class="p-3">Brand</th>
-                <th class="p-3">Primary</th>
-                <th class="p-3">Accent</th>
-                <th class="p-3">Email</th>
-                <th class="p-3 w-1">Edit</th>
-              </tr>
-            </thead>
-            <tbody id="themes-tbody"></tbody>
-          </table>
-        </div>
-      </section>
+    <div class="flex items-center gap-2">
+      <input id="search" type="search" placeholder="Search slug, brand, email…"
+             class="w-64 rounded-lg border p-2" />
+      <button id="btn-create" class="rounded-lg bg-slate-900 text-white px-3 py-2">Create theme</button>
+    </div>
+  </div>
+
+  <div class="text-sm text-slate-500 mb-2" id="theme-count"></div>
+
+  <div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
+    <table class="min-w-full text-sm" id="themes-table">
+      <thead class="bg-slate-50 text-left">
+        <tr>
+          <th class="p-3">Slug ▲</th>
+          <th class="p-3">Brand</th>
+          <th class="p-3">Primary</th>
+          <th class="p-3">Accent</th>
+          <th class="p-3">Email</th>
+          <th class="p-3 w-1">Edit</th>
+        </tr>
+      </thead>
+      <tbody id="themes-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
     </main>
 
     <!-- Edit Drawer / Modal -->
