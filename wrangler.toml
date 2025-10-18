@@ -1,7 +1,22 @@
-name = "podfy-admin-local"
+name = "podfy-admin"
 compatibility_date = "2025-10-18"
 pages_build_output_dir = "public"
 
-# For local dev of Pages Functions:
-[pages]
-# Serve /public and /functions
+# --- D1 binding ---
+# Get the database_id from Cloudflare → D1 → podfy-db → Overview
+[[d1_databases]]
+binding = "DB"
+database_name = "podfy-themes-qa"
+database_id = "a45507d2-ff5b-4b9b-a8c2-fdf993e6fd56"
+
+# --- R2 binding (optional if you use it later) ---
+# Bucket name from R2 dashboard
+[[r2_buckets]]
+binding = "POD_BUCKET"
+bucket_name = "podfy-uploads"
+
+# Plain (non-secret) env vars are fine here.
+[vars]
+COOKIE_NAME = "sida"
+COOKIE_DOMAIN = "admin.podfy.net"
+COOKIE_MAX_AGE = "7200"
