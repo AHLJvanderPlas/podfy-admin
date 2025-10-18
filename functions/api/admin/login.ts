@@ -1,4 +1,4 @@
-import { signJWT, setCookie } from "../../../_utils/auth";
+import { signJWT, setCookie } from "../../_utils/auth";
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   // Minimal email-only login for now (we’ll front this with CF Access later)
