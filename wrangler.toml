@@ -1,0 +1,6 @@
+name = "podfy-admin-local"
+compatibility_date = "2025-10-18"
+
+# For local dev of Pages Functions:
+[pages]
+# Serve /public and /functions
