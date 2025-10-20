@@ -1,3 +1,5 @@
+// public/app.js
+
 // ---------- tiny logger ----------
 const LOG = (...a) => console.log("[admin]", ...a);
 
@@ -76,6 +78,19 @@ function validateList(arr) {
   if (arr.length > MAX_PER_LIST) return `Max ${MAX_PER_LIST} addresses`;
   for (const e of arr) if (!EMAIL_RE.test(e)) return `Invalid email: ${e}`;
   return "";
+}
+function setBrandingLogo(url) {
+  const img = $("branding-logo-preview");
+  const code = $("branding-logo-url");
+  if (!img || !code) return; // in case the block isn't present
+  code.textContent = url || "(none)";
+  if (url) {
+    img.style.display = "";
+    img.src = url;
+  } else {
+    img.style.display = "none";
+    img.removeAttribute("src");
+  }
 }
 
 // ---------- state ----------
@@ -229,7 +244,7 @@ function openEditor(t, creating) {
   wireColor("f-color_border", "p-color_border");
   wireColor("f-color_button_text", "p-color_button_text");
 
-  // Load slug settings (recipients)
+  // Load slug settings (recipients + branding logo)
   (async () => {
     const slug = $("f-slug").value.trim();
     if (!slug) return;
@@ -241,8 +256,12 @@ function openEditor(t, creating) {
       $("f-recip-to").value = rec.to.join(", ");
       $("f-recip-cc").value = rec.cc.join(", ");
       $("f-recip-bcc").value = rec.bcc.join(", ");
+
+      const logoUrl = s?.branding?.logo_url ?? null;
+      setBrandingLogo(logoUrl);
     } catch (e) {
       console.warn("Load settings failed", e);
+      setBrandingLogo(null);
     }
   })();
 
@@ -357,10 +376,82 @@ window.addEventListener("DOMContentLoaded", () => {
     renderThemesTable();
   });
 
-  $("btn-test-send").addEventListener("click", () => {
+  // Test send: protected, validates and records audit log (no real email sent)
+  $("btn-test-send")?.addEventListener("click", async () => {
+    const slug = $("f-slug").value.trim();
+    if (!slug) return;
+
     const to = parseEmails($("f-recip-to").value);
-    if (!to.length) return alert("Add at least one TO recipient first.");
-    alert(`(stub) Would send test to: ${to.join(", ")}`);
+    const cc = parseEmails($("f-recip-cc").value);
+    const bcc = parseEmails($("f-recip-bcc").value);
+
+    const vTo = validateList(to),
+      vCc = validateList(cc),
+      vBcc = validateList(bcc);
+    let hasErr = false;
+    [
+      ["err-to", vTo],
+      ["err-cc", vCc],
+      ["err-bcc", vBcc],
+    ].forEach(([id, msg]) => {
+      const el = $(id);
+      el.textContent = msg;
+      el.classList[msg ? "remove" : "add"]("hidden");
+      if (msg) hasErr = true;
+    });
+    if (to.length === 0) {
+      const el = $("err-to");
+      el.textContent = "At least one TO recipient is required";
+      el.classList.remove("hidden");
+      hasErr = true;
+    }
+    if (hasErr) {
+      $("save-status").textContent = "Fix recipients before testing";
+      return;
+    }
+
+    $("save-status").textContent = "Sending test…";
+    try {
+      const res = await fetch("/api/admin/test-send", {
+        method: "POST",
+        credentials: "include",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ slug, email_recipients: { to, cc, bcc } }),
+      }).then((r) => r.json());
+      if (res?.ok) {
+        $("save-status").textContent = `Test recorded ✓ (${res.counts.to} to, ${res.counts.cc} cc, ${res.counts.bcc} bcc)`;
+      } else {
+        $("save-status").textContent = res?.error || "Test send failed";
+      }
+    } catch (e) {
+      console.error(e);
+      $("save-status").textContent = "Test send failed";
+    } finally {
+      setTimeout(() => {
+        $("save-status").textContent = "";
+      }, 2500);
+    }
+  });
+
+  // Branding logo refresh button (uses GET ?refreshLogo=1)
+  $("btn-refresh-logo")?.addEventListener("click", async () => {
+    const slug = $("f-slug").value.trim();
+    if (!slug) return;
+    $("save-status").textContent = "Refreshing logo…";
+    try {
+      const s = await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings?refreshLogo=1`, {
+        credentials: "include",
+      }).then((r) => r.json());
+      const logoUrl = s?.branding?.logo_url ?? null;
+      setBrandingLogo(logoUrl);
+      $("save-status").textContent = "Logo refreshed ✓";
+      setTimeout(() => {
+        $("save-status").textContent = "";
+      }, 1200);
+    } catch (e) {
+      console.error(e);
+      $("save-status").textContent = "Failed to refresh logo";
+    }
   });
 
   checkAuth();
