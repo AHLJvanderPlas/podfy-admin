@@ -18,6 +18,22 @@ async function api(path, init) {
 const $ = (id) => document.getElementById(id);
 const hide = (el, v) => el.classList[v ? "add" : "remove"]("hidden");
 
+// --- recipients helpers ---
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+const MAX_PER_LIST = 25;
+
+function parseEmails(s) {
+  if (!s) return [];
+  // split by comma, semicolon, or whitespace
+  return String(s).split(/[\s,;]+/).map(v => v.trim()).filter(Boolean);
+}
+function validateList(arr) {
+  if (arr.length > MAX_PER_LIST) return `Max ${MAX_PER_LIST} addresses`;
+  for (const e of arr) if (!EMAIL_RE.test(e)) return `Invalid email: ${e}`;
+  return "";
+}
+
+
 // ---------- state ----------
 let themes = [];
 let isNew = false;
@@ -171,6 +187,28 @@ function openEditor(t, creating) {
   wireColor("f-color_button_text", "p-color_button_text");
 
   hide($("edit-modal"), false);
+
+  // Load slug settings (recipients)
+(async () => {
+  const slug = $("f-slug").value.trim();
+  if (!slug) return;
+  try {
+    const s = await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings`, { credentials: "include" }).then(r => r.json());
+    const rec = s?.email_recipients || { to:[], cc:[], bcc:[] };
+
+    // Fill textareas (comma-separated)
+    $("f-recip-to").value  = rec.to.join(", ");
+    $("f-recip-cc").value  = rec.cc.join(", ");
+    $("f-recip-bcc").value = rec.bcc.join(", ");
+
+    // Backward-compat tip:
+    const showTip = (rec?.to?.length || 0) > 0 && (current?.email || null) ? true : false; // legacy present
+    $("legacy-tip").classList[showTip ? "remove" : "add"]("hidden");
+  } catch (e) {
+    console.warn("Load settings failed", e);
+  }
+})();
+
 }
 
 async function saveEdits(e) {
@@ -211,6 +249,44 @@ async function saveEdits(e) {
     const msg = String(e.message || e);
     $("save-status").textContent = msg.startsWith("<!DOCTYPE") ? "Server error (HTML response). Check function logs." : msg;
   }
+
+  // Build recipients payload from textareas
+const to  = parseEmails($("f-recip-to").value);
+const cc  = parseEmails($("f-recip-cc").value);
+const bcc = parseEmails($("f-recip-bcc").value);
+
+// Validate before sending
+const vTo  = validateList(to);
+const vCc  = validateList(cc);
+const vBcc = validateList(bcc);
+let hasErr = false;
+[["err-to", vTo], ["err-cc", vCc], ["err-bcc", vBcc]].forEach(([id, msg]) => {
+  const el = $(id); el.textContent = msg; el.classList[msg ? "remove" : "add"]("hidden");
+  if (msg) hasErr = true;
+});
+if (to.length === 0) {
+  const el = $("err-to"); el.textContent = "At least one TO recipient is required"; el.classList.remove("hidden");
+  hasErr = true;
+}
+if (hasErr) { $("save-status").textContent = "Fix recipients before saving"; return; }
+
+// PATCH slug settings
+try {
+  const slug = $("f-slug").value.trim();
+  await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ email_recipients: { to, cc, bcc } })
+  }).then(async r => {
+    if (!r.ok) throw new Error(await r.text());
+  });
+} catch (e) {
+  console.error("Save settings failed", e);
+  $("save-status").textContent = "Error saving recipients";
+  return;
+}
+
 }
 
 // ---------- bootstrap ----------
