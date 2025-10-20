@@ -241,10 +241,6 @@ function openEditor(t, creating) {
       $("f-recip-to").value = rec.to.join(", ");
       $("f-recip-cc").value = rec.cc.join(", ");
       $("f-recip-bcc").value = rec.bcc.join(", ");
-
-      // backward-compat tip: show if legacy existed and now To is not empty
-      const showTip = (rec?.to?.length || 0) > 0 && (current?.email || null);
-      $("legacy-tip").classList[showTip ? "remove" : "add"]("hidden");
     } catch (e) {
       console.warn("Load settings failed", e);
     }
