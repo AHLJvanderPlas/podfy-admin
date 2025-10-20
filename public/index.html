@@ -2,8 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>PODFY Admin</title>
+    <!-- Tailwind (CDN for admin UI) -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900">
@@ -18,24 +22,33 @@
     </header>
 
     <main class="mx-auto max-w-5xl p-4">
-      <!-- Login -->
+      <!-- Login Card -->
       <section id="view-login" class="mt-10">
         <div class="mx-auto max-w-md rounded-2xl bg-white shadow p-6 space-y-4">
           <h1 class="text-xl font-semibold">Sign in</h1>
           <p class="text-sm text-slate-500">Enter your admin email to start.</p>
-          <input id="login-email" type="email" placeholder="you@podfy.net" class="w-full rounded-lg border p-2" />
-          <button id="btn-login" class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50">Sign in</button>
-          <p class="text-xs text-slate-500">This instance uses email-only login for now (fronted by cookie). In production, we recommend Cloudflare Access + MFA.</p>
+          <input id="login-email" type="email" placeholder="you@podfy.net"
+                 class="w-full rounded-lg border p-2" />
+          <button id="btn-login"
+                  class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50">
+            Sign in
+          </button>
+          <p class="text-xs text-slate-500">
+            This instance uses email-only login for now (fronted by cookie). In production,
+            we recommend Cloudflare Access + MFA.
+          </p>
           <p id="login-error" class="text-sm text-red-600 hidden"></p>
         </div>
       </section>
 
-      <!-- Themes -->
+      <!-- Themes List -->
       <section id="view-themes" class="hidden">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 class="text-xl font-semibold">Themes</h2>
+
           <div class="flex items-center gap-2">
-            <input id="search" type="search" placeholder="Search slug, brand, email…" class="w-64 rounded-lg border p-2" />
+            <input id="search" type="search" placeholder="Search slug, brand…"
+                   class="w-64 rounded-lg border p-2" />
             <button id="btn-create" class="rounded-lg bg-slate-900 text-white px-3 py-2">Create theme</button>
           </div>
         </div>
@@ -46,18 +59,15 @@
           <table class="min-w-full text-sm" id="themes-table">
             <thead class="bg-slate-50 text-left">
               <tr>
-                <thead class="bg-slate-50 text-left">
-                  <tr>
-                    <th class="p-3">Slug ▲</th>
-                    <th class="p-3">Brand</th>
-                    <th class="p-3">Primary</th>
-                    <th class="p-3">Accent</th>
-                    <th class="p-3">Recipients</th>
-                    <th class="p-3 w-1">Edit</th>
-                  </tr>
-                </thead>
-        <tbody id="themes-tbody"></tbody>
-
+                <th class="p-3">Slug ▲</th>
+                <th class="p-3">Brand</th>
+                <th class="p-3">Primary</th>
+                <th class="p-3">Accent</th>
+                <th class="p-3">Recipients</th>
+                <th class="p-3 w-1">Edit</th>
+              </tr>
+            </thead>
+            <tbody id="themes-tbody"></tbody>
           </table>
         </div>
       </section>
@@ -76,6 +86,7 @@
         </div>
 
         <form id="edit-form" class="p-4 space-y-3">
+          <!-- Slug -->
           <label class="block">
             <span class="text-sm text-slate-600">Slug</span>
             <input id="f-slug" class="w-full rounded border p-2 bg-white" />
@@ -103,7 +114,7 @@
             </label>
           </div>
 
-          <!-- Color pairs -->
+          <!-- Colors -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <label class="block">
               <span class="text-sm text-slate-600">Primary color</span>
@@ -154,34 +165,34 @@
             <input id="f-header_bg" class="w-full rounded border p-2" placeholder="#FFFFFF" />
           </label>
 
-<!-- Recipients -->
-<div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <span class="text-sm text-slate-600 font-medium">Recipients</span>
-    <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">Test send</button>
-  </div>
-  <p id="legacy-tip" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
-    We’ve migrated your default email into <b>Recipients → To</b>.
-  </p>
+          <!-- Recipients -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-slate-600 font-medium">Recipients</span>
+              <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">Test send</button>
+            </div>
+            <p id="legacy-tip" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+              We’ve migrated your default email into <b>Recipients → To</b>.
+            </p>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">To (required)</span>
-    <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2" placeholder="one or more emails, comma/space separated"></textarea>
-    <span id="err-to" class="hidden text-xs text-red-600"></span>
-  </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">To (required)</span>
+              <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2" placeholder="one or more emails, comma/space separated"></textarea>
+              <span id="err-to" class="hidden text-xs text-red-600"></span>
+            </label>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">CC (optional)</span>
-    <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
-    <span id="err-cc" class="hidden text-xs text-red-600"></span>
-  </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">CC (optional)</span>
+              <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
+              <span id="err-cc" class="hidden text-xs text-red-600"></span>
+            </label>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">BCC (optional)</span>
-    <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
-    <span id="err-bcc" class="hidden text-xs text-red-600"></span>
-  </label>
-</div>
+            <label class="block">
+              <span class="text-sm text-slate-600">BCC (optional)</span>
+              <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
+              <span id="err-bcc" class="hidden text-xs text-red-600"></span>
+            </label>
+          </div>
 
           <label class="block">
             <span class="text-sm text-slate-600">Internal notes</span>
@@ -196,7 +207,7 @@
       </div>
     </div>
 
-    <!-- Only ONE script: your app -->
+    <!-- Single app script -->
     <script src="/app.js" defer></script>
   </body>
 </html>
