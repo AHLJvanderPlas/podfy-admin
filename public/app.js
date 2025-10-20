@@ -3,7 +3,7 @@
 // ---------- tiny logger ----------
 const LOG = (...a) => console.log("[admin]", ...a);
 
-// ---------- helpers ----------
+// ---------- generic helpers ----------
 async function api(path, init) {
   const res = await fetch(path, {
     credentials: "include",
@@ -63,7 +63,7 @@ function wireColor(textId, pickerId) {
   tintInput(t, start);
 }
 
-// ---------- recipients helpers ----------
+// ---------- recipients + branding helpers ----------
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const MAX_PER_LIST = 25;
 
@@ -79,14 +79,28 @@ function validateList(arr) {
   for (const e of arr) if (!EMAIL_RE.test(e)) return `Invalid email: ${e}`;
   return "";
 }
+
 function setBrandingLogo(url) {
   const img = $("branding-logo-preview");
   const code = $("branding-logo-url");
-  if (!img || !code) return; // in case the block isn't present
+  if (!img || !code) return;
   code.textContent = url || "(none)";
   if (url) {
     img.style.display = "";
     img.src = url;
+  } else {
+    img.style.display = "none";
+    img.removeAttribute("src");
+  }
+}
+
+// NEW: header logo (top-right in the drawer)
+function setHeaderLogo(url) {
+  const img = $("brand-header-logo");
+  if (!img) return;
+  if (url && url.trim()) {
+    img.src = url;
+    img.style.display = "";
   } else {
     img.style.display = "none";
     img.removeAttribute("src");
@@ -218,6 +232,9 @@ function openEditor(t, creating) {
   current = t || {};
   isNew = !!creating;
 
+  // clear header logo while loading
+  setHeaderLogo(null);
+
   $("edit-title").textContent = creating ? "Create theme" : current.brand_name || current.slug || "";
   $("f-slug").value = current.slug || "";
   $("f-slug").disabled = !creating;
@@ -252,16 +269,19 @@ function openEditor(t, creating) {
       const s = await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings`, {
         credentials: "include",
       }).then((r) => r.json());
+
       const rec = s?.email_recipients || { to: [], cc: [], bcc: [] };
-      $("f-recip-to").value = rec.to.join(", ");
-      $("f-recip-cc").value = rec.cc.join(", ");
+      $("f-recip-to").value  = rec.to.join(", ");
+      $("f-recip-cc").value  = rec.cc.join(", ");
       $("f-recip-bcc").value = rec.bcc.join(", ");
 
       const logoUrl = s?.branding?.logo_url ?? null;
-      setBrandingLogo(logoUrl);
+      setBrandingLogo(logoUrl); // preview block (if present)
+      setHeaderLogo(logoUrl);   // header avatar
     } catch (e) {
       console.warn("Load settings failed", e);
       setBrandingLogo(null);
+      setHeaderLogo(null);
     }
   })();
 
@@ -361,16 +381,22 @@ async function saveEdits(e) {
 
 // ---------- bootstrap ----------
 window.addEventListener("DOMContentLoaded", () => {
+  // auth
   $("btn-login").addEventListener("click", doLogin);
   $("login-email").addEventListener("keydown", (ev) => {
     if (ev.key === "Enter") doLogin();
   });
-
   $("btn-logout").addEventListener("click", doLogout);
+
+  // nav
   $("nav-themes").addEventListener("click", () => hide($("view-themes"), false));
+
+  // modal + form
   $("btn-close").addEventListener("click", () => hide($("edit-modal"), true));
   $("edit-form").addEventListener("submit", saveEdits);
   $("btn-create").addEventListener("click", () => openEditor(null, true));
+
+  // search
   $("search").addEventListener("input", (e) => {
     q = e.target.value;
     renderThemesTable();
@@ -444,6 +470,7 @@ window.addEventListener("DOMContentLoaded", () => {
       }).then((r) => r.json());
       const logoUrl = s?.branding?.logo_url ?? null;
       setBrandingLogo(logoUrl);
+      setHeaderLogo(logoUrl);
       $("save-status").textContent = "Logo refreshed ✓";
       setTimeout(() => {
         $("save-status").textContent = "";
