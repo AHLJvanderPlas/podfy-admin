@@ -78,10 +78,17 @@
       <div class="absolute inset-0 bg-black/40"></div>
       <div class="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl overflow-y-auto">
         <div class="p-4 border-b flex items-center justify-between">
-          <div>
-            <div class="text-sm uppercase tracking-wide text-slate-500">Edit theme</div>
-            <div id="edit-title" class="text-lg font-semibold"></div>
-          </div>
+<!-- Drawer header -->
+<div class="flex items-center justify-between mb-4">
+  <h3 id="edit-title" class="text-lg font-semibold text-slate-900">Edit theme</h3>
+  <img
+    id="brand-header-logo"
+    alt="Brand logo"
+    class="h-10 w-10 rounded bg-white object-contain border shadow-sm p-1"
+    style="display:none"
+  />
+</div>
+
           <button id="btn-close" class="p-2 rounded hover:bg-slate-100">✕</button>
         </div>
 
