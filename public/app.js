@@ -152,6 +152,18 @@ function renderThemesTable() {
     tr.querySelector("button").addEventListener("click", () => openEditor(t, false));
     tbody.appendChild(tr);
   }
+  const settingsCache = new Map(); // slug -> {to,cc,bcc}
+async function getRecipCounts(slug) {
+  if (settingsCache.has(slug)) return settingsCache.get(slug);
+  try {
+    const s = await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings`, { credentials: "include" }).then(r => r.json());
+    const rec = s?.email_recipients || { to:[], cc:[], bcc:[] };
+    const val = { to: rec.to.length|0, cc: rec.cc.length|0, bcc: rec.bcc.length|0 };
+    settingsCache.set(slug, val);
+    return val;
+  } catch { return { to:0, cc:0, bcc:0 }; }
+}
+
 }
 
 // ---------- editor ----------
