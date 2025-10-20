@@ -2,10 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>PODFY Admin</title>
     <!-- Tailwind (CDN for admin UI) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,6 +13,7 @@
         <div class="font-semibold tracking-wide">PODFY Admin</div>
         <nav class="flex items-center gap-4">
           <button id="nav-themes" class="px-3 py-1 rounded hover:bg-slate-100 hidden">Themes</button>
+          <button id="nav-audit"  class="px-3 py-1 rounded hover:bg-slate-100 hidden">Audit</button>
           <button id="btn-logout" class="px-3 py-1 rounded bg-slate-900 text-white hidden">Logout</button>
         </nav>
       </div>
@@ -33,10 +31,6 @@
                   class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50">
             Sign in
           </button>
-          <p class="text-xs text-slate-500">
-            This instance uses email-only login for now (fronted by cookie). In production,
-            we recommend Cloudflare Access + MFA.
-          </p>
           <p id="login-error" class="text-sm text-red-600 hidden"></p>
         </div>
       </section>
@@ -45,7 +39,6 @@
       <section id="view-themes" class="hidden">
         <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 class="text-xl font-semibold">Themes</h2>
-
           <div class="flex items-center gap-2">
             <input id="search" type="search" placeholder="Search slug, brand…"
                    class="w-64 rounded-lg border p-2" />
@@ -71,6 +64,41 @@
           </table>
         </div>
       </section>
+
+      <!-- Audit View -->
+      <section id="view-audit" class="hidden">
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 class="text-xl font-semibold">Audit</h2>
+          <div class="flex items-center gap-2">
+            <div class="rounded-lg border bg-white p-1 flex">
+              <button id="audit-type-admin" class="px-3 py-1 rounded bg-slate-900 text-white">Admin</button>
+              <button id="audit-type-user"  class="px-3 py-1 rounded hover:bg-slate-100">User</button>
+            </div>
+            <input id="audit-search" type="search" placeholder="Search action, target, email…"
+                   class="w-72 rounded-lg border p-2" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
+          <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 text-left">
+              <tr>
+                <th class="p-3">Time</th>
+                <th class="p-3">Actor</th>
+                <th class="p-3">Action</th>
+                <th class="p-3">Target</th>
+                <th class="p-3">Payload</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="flex justify-between items-center mt-3">
+          <div class="text-sm text-slate-500" id="audit-status">Newest first</div>
+          <button id="audit-more" class="rounded-lg border px-3 py-2 bg-white hover:bg-slate-50">Load more</button>
+        </div>
+      </section>
     </main>
 
     <!-- Edit Drawer / Modal -->
@@ -78,17 +106,16 @@
       <div class="absolute inset-0 bg-black/40"></div>
       <div class="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl overflow-y-auto">
         <div class="p-4 border-b flex items-center justify-between">
-<!-- Drawer header -->
-<div class="flex items-center justify-between mb-4">
-  <h3 id="edit-title" class="text-lg font-semibold text-slate-900">Edit theme</h3>
-  <img
-    id="brand-header-logo"
-    alt="Brand logo"
-    class="h-10 w-10 rounded bg-white object-contain border shadow-sm p-1"
-    style="display:none"
-  />
-</div>
-
+          <!-- Drawer header with brand logo -->
+          <div class="flex items-center gap-3">
+            <h3 id="edit-title" class="text-lg font-semibold text-slate-900">Edit theme</h3>
+          </div>
+          <img
+            id="brand-header-logo"
+            alt="Brand logo"
+            class="h-10 w-10 rounded bg-white object-contain border shadow-sm p-1"
+            style="display:none"
+          />
           <button id="btn-close" class="p-2 rounded hover:bg-slate-100">✕</button>
         </div>
 
@@ -172,36 +199,52 @@
             <input id="f-header_bg" class="w-full rounded border p-2" placeholder="#FFFFFF" />
           </label>
 
-<!-- Recipients -->
-<div class="space-y-2">
-  <div class="flex items-center justify-between">
-    <span class="text-sm text-slate-600 font-medium">Recipients</span>
-    <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">
-      Test send
-    </button>
-  </div>
+          <!-- Recipients -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-slate-600 font-medium">Recipients</span>
+              <div class="flex items-center gap-2">
+                <button id="btn-refresh-logo" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">
+                  Fetch logo from podfy.app
+                </button>
+                <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">
+                  Test send
+                </button>
+              </div>
+            </div>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">To (required)</span>
-    <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2"
-              placeholder="one or more emails, comma/space separated"></textarea>
-    <span id="err-to" class="hidden text-xs text-red-600"></span>
-  </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">To (required)</span>
+              <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2"
+                        placeholder="one or more emails, comma/space separated"></textarea>
+              <span id="err-to" class="hidden text-xs text-red-600"></span>
+            </label>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">CC (optional)</span>
-    <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2"
-              placeholder="comma/space separated"></textarea>
-    <span id="err-cc" class="hidden text-xs text-red-600"></span>
-  </label>
+            <label class="block">
+              <span class="text-sm text-slate-600">CC (optional)</span>
+              <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2"
+                        placeholder="comma/space separated"></textarea>
+              <span id="err-cc" class="hidden text-xs text-red-600"></span>
+            </label>
 
-  <label class="block">
-    <span class="text-sm text-slate-600">BCC (optional)</span>
-    <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2"
-              placeholder="comma/space separated"></textarea>
-    <span id="err-bcc" class="hidden text-xs text-red-600"></span>
-  </label>
-</div>
+            <label class="block">
+              <span class="text-sm text-slate-600">BCC (optional)</span>
+              <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2"
+                        placeholder="comma/space separated"></textarea>
+              <span id="err-bcc" class="hidden text-xs text-red-600"></span>
+            </label>
+          </div>
+
+          <!-- Branding preview -->
+          <div class="rounded-lg border bg-slate-50 p-3">
+            <div class="text-sm text-slate-600 mb-2">Branding</div>
+            <div class="flex items-center gap-3">
+              <img id="branding-logo-preview" alt="Brand logo preview"
+                   class="h-12 w-12 rounded bg-white object-contain border shadow-sm p-1"
+                   style="display:none" />
+              <code id="branding-logo-url" class="text-xs text-slate-600 break-all">(none)</code>
+            </div>
+          </div>
 
           <label class="block">
             <span class="text-sm text-slate-600">Internal notes</span>
