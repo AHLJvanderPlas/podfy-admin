@@ -46,15 +46,18 @@
           <table class="min-w-full text-sm" id="themes-table">
             <thead class="bg-slate-50 text-left">
               <tr>
-                <th class="p-3">Slug ▲</th>
-                <th class="p-3">Brand</th>
-                <th class="p-3">Primary</th>
-                <th class="p-3">Accent</th>
-                <th class="p-3">Email</th>
-                <th class="p-3 w-1">Edit</th>
-              </tr>
-            </thead>
-            <tbody id="themes-tbody"></tbody>
+                <thead class="bg-slate-50 text-left">
+                  <tr>
+                    <th class="p-3">Slug ▲</th>
+                    <th class="p-3">Brand</th>
+                    <th class="p-3">Primary</th>
+                    <th class="p-3">Accent</th>
+                    <th class="p-3">Recipients</th>
+                    <th class="p-3 w-1">Edit</th>
+                  </tr>
+                </thead>
+        <tbody id="themes-tbody"></tbody>
+
           </table>
         </div>
       </section>
@@ -151,10 +154,34 @@
             <input id="f-header_bg" class="w-full rounded border p-2" placeholder="#FFFFFF" />
           </label>
 
-          <label class="block">
-            <span class="text-sm text-slate-600">Default email (notifications)</span>
-            <input id="f-email" class="w-full rounded border p-2" placeholder="no-reply@brand.com" />
-          </label>
+<!-- Recipients -->
+<div class="space-y-2">
+  <div class="flex items-center justify-between">
+    <span class="text-sm text-slate-600 font-medium">Recipients</span>
+    <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">Test send</button>
+  </div>
+  <p id="legacy-tip" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded p-2">
+    We’ve migrated your default email into <b>Recipients → To</b>.
+  </p>
+
+  <label class="block">
+    <span class="text-sm text-slate-600">To (required)</span>
+    <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2" placeholder="one or more emails, comma/space separated"></textarea>
+    <span id="err-to" class="hidden text-xs text-red-600"></span>
+  </label>
+
+  <label class="block">
+    <span class="text-sm text-slate-600">CC (optional)</span>
+    <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
+    <span id="err-cc" class="hidden text-xs text-red-600"></span>
+  </label>
+
+  <label class="block">
+    <span class="text-sm text-slate-600">BCC (optional)</span>
+    <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2" placeholder="comma/space separated"></textarea>
+    <span id="err-bcc" class="hidden text-xs text-red-600"></span>
+  </label>
+</div>
 
           <label class="block">
             <span class="text-sm text-slate-600">Internal notes</span>
