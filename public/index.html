@@ -2,19 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <title>PODFY Admin</title>
     <!-- Tailwind (CDN for admin UI) -->
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-900">
     <header class="bg-white shadow-sm">
-      <div class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
+      <div
+        class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between"
+      >
         <div class="font-semibold tracking-wide">PODFY Admin</div>
         <nav class="flex items-center gap-4">
-          <button id="nav-themes" class="px-3 py-1 rounded hover:bg-slate-100 hidden">Themes</button>
-          <button id="nav-audit"  class="px-3 py-1 rounded hover:bg-slate-100 hidden">Audit</button>
-          <button id="btn-logout" class="px-3 py-1 rounded bg-slate-900 text-white hidden">Logout</button>
+          <button
+            id="nav-themes"
+            class="px-3 py-1 rounded hover:bg-slate-100 hidden"
+          >
+            Themes
+          </button>
+          <button
+            id="nav-audit"
+            class="px-3 py-1 rounded hover:bg-slate-100 hidden"
+          >
+            Audit
+          </button>
+          <button
+            id="btn-logout"
+            class="px-3 py-1 rounded bg-slate-900 text-white hidden"
+          >
+            Logout
+          </button>
         </nav>
       </div>
     </header>
@@ -25,10 +45,16 @@
         <div class="mx-auto max-w-md rounded-2xl bg-white shadow p-6 space-y-4">
           <h1 class="text-xl font-semibold">Sign in</h1>
           <p class="text-sm text-slate-500">Enter your admin email to start.</p>
-          <input id="login-email" type="email" placeholder="you@podfy.net"
-                 class="w-full rounded-lg border p-2" />
-          <button id="btn-login"
-                  class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50">
+          <input
+            id="login-email"
+            type="email"
+            placeholder="you@podfy.net"
+            class="w-full rounded-lg border p-2"
+          />
+          <button
+            id="btn-login"
+            class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50"
+          >
             Sign in
           </button>
           <p id="login-error" class="text-sm text-red-600 hidden"></p>
@@ -37,12 +63,23 @@
 
       <!-- Themes List -->
       <section id="view-themes" class="hidden">
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
           <h2 class="text-xl font-semibold">Themes</h2>
           <div class="flex items-center gap-2">
-            <input id="search" type="search" placeholder="Search slug, brand…"
-                   class="w-64 rounded-lg border p-2" />
-            <button id="btn-create" class="rounded-lg bg-slate-900 text-white px-3 py-2">Create theme</button>
+            <input
+              id="search"
+              type="search"
+              placeholder="Search slug, brand…"
+              class="w-64 rounded-lg border p-2"
+            />
+            <button
+              id="btn-create"
+              class="rounded-lg bg-slate-900 text-white px-3 py-2"
+            >
+              Create theme
+            </button>
           </div>
         </div>
 
@@ -67,15 +104,31 @@
 
       <!-- Audit View -->
       <section id="view-audit" class="hidden">
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        >
           <h2 class="text-xl font-semibold">Audit</h2>
           <div class="flex items-center gap-2">
             <div class="rounded-lg border bg-white p-1 flex">
-              <button id="audit-type-admin" class="px-3 py-1 rounded bg-slate-900 text-white">Admin</button>
-              <button id="audit-type-user"  class="px-3 py-1 rounded hover:bg-slate-100">User</button>
+              <button
+                id="audit-type-admin"
+                class="px-3 py-1 rounded bg-slate-900 text-white"
+              >
+                Admin
+              </button>
+              <button
+                id="audit-type-user"
+                class="px-3 py-1 rounded hover:bg-slate-100"
+              >
+                User
+              </button>
             </div>
-            <input id="audit-search" type="search" placeholder="Search action, target, email…"
-                   class="w-72 rounded-lg border p-2" />
+            <input
+              id="audit-search"
+              type="search"
+              placeholder="Search action, target, email…"
+              class="w-72 rounded-lg border p-2"
+            />
           </div>
         </div>
 
@@ -95,8 +148,15 @@
         </div>
 
         <div class="flex justify-between items-center mt-3">
-          <div class="text-sm text-slate-500" id="audit-status">Newest first</div>
-          <button id="audit-more" class="rounded-lg border px-3 py-2 bg-white hover:bg-slate-50">Load more</button>
+          <div class="text-sm text-slate-500" id="audit-status">
+            Newest first
+          </div>
+          <button
+            id="audit-more"
+            class="rounded-lg border px-3 py-2 bg-white hover:bg-slate-50"
+          >
+            Load more
+          </button>
         </div>
       </section>
     </main>
@@ -104,11 +164,15 @@
     <!-- Edit Drawer / Modal -->
     <div id="edit-modal" class="fixed inset-0 z-50 hidden">
       <div class="absolute inset-0 bg-black/40"></div>
-      <div class="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl overflow-y-auto">
+      <div
+        class="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl overflow-y-auto"
+      >
         <div class="p-4 border-b flex items-center justify-between">
           <!-- Drawer header with brand logo -->
           <div class="flex items-center gap-3">
-            <h3 id="edit-title" class="text-lg font-semibold text-slate-900">Edit theme</h3>
+            <h3 id="edit-title" class="text-lg font-semibold text-slate-900">
+              Edit theme
+            </h3>
           </div>
           <img
             id="brand-header-logo"
@@ -153,50 +217,102 @@
             <label class="block">
               <span class="text-sm text-slate-600">Primary color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_primary" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_primary" class="flex-1 rounded border p-2" placeholder="#111827" />
+                <input
+                  id="p-color_primary"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_primary"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#111827"
+                />
               </div>
             </label>
             <label class="block">
               <span class="text-sm text-slate-600">Accent color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_accent" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_accent" class="flex-1 rounded border p-2" placeholder="#06b6d4" />
+                <input
+                  id="p-color_accent"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_accent"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#06b6d4"
+                />
               </div>
             </label>
             <label class="block">
               <span class="text-sm text-slate-600">Text color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_text" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_text" class="flex-1 rounded border p-2" placeholder="#0B1220" />
+                <input
+                  id="p-color_text"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_text"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#0B1220"
+                />
               </div>
             </label>
             <label class="block">
               <span class="text-sm text-slate-600">Muted color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_muted" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_muted" class="flex-1 rounded border p-2" placeholder="#6B7280" />
+                <input
+                  id="p-color_muted"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_muted"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#6B7280"
+                />
               </div>
             </label>
             <label class="block">
               <span class="text-sm text-slate-600">Border color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_border" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_border" class="flex-1 rounded border p-2" placeholder="#E5E7EB" />
+                <input
+                  id="p-color_border"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_border"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#E5E7EB"
+                />
               </div>
             </label>
             <label class="block">
               <span class="text-sm text-slate-600">Button text color</span>
               <div class="flex items-center gap-2">
-                <input id="p-color_button_text" type="color" class="h-10 w-10 rounded border" />
-                <input id="f-color_button_text" class="flex-1 rounded border p-2" placeholder="#FFFFFF" />
+                <input
+                  id="p-color_button_text"
+                  type="color"
+                  class="h-10 w-10 rounded border"
+                />
+                <input
+                  id="f-color_button_text"
+                  class="flex-1 rounded border p-2"
+                  placeholder="#FFFFFF"
+                />
               </div>
             </label>
           </div>
 
           <label class="block">
             <span class="text-sm text-slate-600">Header background</span>
-            <input id="f-header_bg" class="w-full rounded border p-2" placeholder="#FFFFFF" />
+            <input
+              id="f-header_bg"
+              class="w-full rounded border p-2"
+              placeholder="#FFFFFF"
+            />
           </label>
 
           <!-- Recipients -->
@@ -204,10 +320,18 @@
             <div class="flex items-center justify-between">
               <span class="text-sm text-slate-600 font-medium">Recipients</span>
               <div class="flex items-center gap-2">
-                <button id="btn-refresh-logo" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">
+                <button
+                  id="btn-refresh-logo"
+                  type="button"
+                  class="text-xs rounded border px-2 py-1 hover:bg-slate-50"
+                >
                   Fetch logo from podfy.app
                 </button>
-                <button id="btn-test-send" type="button" class="text-xs rounded border px-2 py-1 hover:bg-slate-50">
+                <button
+                  id="btn-test-send"
+                  type="button"
+                  class="text-xs rounded border px-2 py-1 hover:bg-slate-50"
+                >
                   Test send
                 </button>
               </div>
@@ -215,22 +339,34 @@
 
             <label class="block">
               <span class="text-sm text-slate-600">To (required)</span>
-              <textarea id="f-recip-to" class="w-full rounded border p-2" rows="2"
-                        placeholder="one or more emails, comma/space separated"></textarea>
+              <textarea
+                id="f-recip-to"
+                class="w-full rounded border p-2"
+                rows="2"
+                placeholder="one or more emails, comma/space separated"
+              ></textarea>
               <span id="err-to" class="hidden text-xs text-red-600"></span>
             </label>
 
             <label class="block">
               <span class="text-sm text-slate-600">CC (optional)</span>
-              <textarea id="f-recip-cc" class="w-full rounded border p-2" rows="2"
-                        placeholder="comma/space separated"></textarea>
+              <textarea
+                id="f-recip-cc"
+                class="w-full rounded border p-2"
+                rows="2"
+                placeholder="comma/space separated"
+              ></textarea>
               <span id="err-cc" class="hidden text-xs text-red-600"></span>
             </label>
 
             <label class="block">
               <span class="text-sm text-slate-600">BCC (optional)</span>
-              <textarea id="f-recip-bcc" class="w-full rounded border p-2" rows="2"
-                        placeholder="comma/space separated"></textarea>
+              <textarea
+                id="f-recip-bcc"
+                class="w-full rounded border p-2"
+                rows="2"
+                placeholder="comma/space separated"
+              ></textarea>
               <span id="err-bcc" class="hidden text-xs text-red-600"></span>
             </label>
           </div>
@@ -239,20 +375,33 @@
           <div class="rounded-lg border bg-slate-50 p-3">
             <div class="text-sm text-slate-600 mb-2">Branding</div>
             <div class="flex items-center gap-3">
-              <img id="branding-logo-preview" alt="Brand logo preview"
-                   class="h-12 w-12 rounded bg-white object-contain border shadow-sm p-1"
-                   style="display:none" />
-              <code id="branding-logo-url" class="text-xs text-slate-600 break-all">(none)</code>
+              <img
+                id="branding-logo-preview"
+                alt="Brand logo preview"
+                class="h-12 w-12 rounded bg-white object-contain border shadow-sm p-1"
+                style="display:none"
+              />
+              <code
+                id="branding-logo-url"
+                class="text-xs text-slate-600 break-all"
+                >(none)</code
+              >
             </div>
           </div>
 
           <label class="block">
             <span class="text-sm text-slate-600">Internal notes</span>
-            <textarea id="f-notes_internal" class="w-full rounded border p-2" rows="3"></textarea>
+            <textarea
+              id="f-notes_internal"
+              class="w-full rounded border p-2"
+              rows="3"
+            ></textarea>
           </label>
 
           <div class="pt-2 flex items-center gap-3">
-            <button id="btn-save" class="rounded-lg bg-slate-900 text-white px-4 py-2">Save</button>
+            <button id="btn-save" class="rounded-lg bg-slate-900 text-white px-4 py-2">
+              Save
+            </button>
             <span id="save-status" class="text-sm text-slate-500"></span>
           </div>
         </form>
