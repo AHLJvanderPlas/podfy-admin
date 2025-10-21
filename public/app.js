@@ -130,9 +130,17 @@ async function doLogin() {
     btn.disabled = false;
   }
 }
-function doLogout() {
-  document.cookie = `sida=; Max-Age=0; Path=/; SameSite=Strict; Secure;`;
-  location.reload();
+async function doLogout() {
+  try {
+    await fetch("/api/admin/logout", {
+      method: "POST",
+      credentials: "include",
+      headers: { "content-type": "application/json" },
+    });
+  } finally {
+    // hard reload to clear in-memory state
+    location.reload();
+  }
 }
 
 // ---------- simple view switch ----------
