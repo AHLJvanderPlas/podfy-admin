@@ -65,21 +65,37 @@ function validateList(arr) {
   return "";
 }
 
+// Adds a tiny cache-buster to avoid stale 404s or cached redirects
+function withBuster(url) {
+  if (!url || !url.trim()) return url;
+  return url.includes("?") ? `${url}&v=${Date.now()}` : `${url}?v=${Date.now()}`;
+}
+
 function setBrandingLogo(url) {
   const img = $("branding-logo-preview");
   const code = $("branding-logo-url");
   if (!img || !code) return;
   code.textContent = url || "(none)";
-  if (url) { img.style.display = ""; img.src = url; }
-  else { img.style.display = "none"; img.removeAttribute("src"); }
+  if (url && url.trim()) {
+    img.src = withBuster(url);
+    img.style.display = "";
+  } else {
+    img.style.display = "none";
+    img.removeAttribute("src");
+  }
 }
 
 // Header logo in drawer
 function setHeaderLogo(url) {
   const img = $("brand-header-logo");
   if (!img) return;
-  if (url && url.trim()) { img.src = url; img.style.display = ""; }
-  else { img.style.display = "none"; img.removeAttribute("src"); }
+  if (url && url.trim()) {
+    img.src = withBuster(url);
+    img.style.display = "";
+  } else {
+    img.style.display = "none";
+    img.removeAttribute("src");
+  }
 }
 
 // ---------- state ----------
@@ -285,14 +301,15 @@ async function saveEdits(e) {
   const slug = $("f-slug").value.trim();
   if (!slug) return ($("save-status").textContent = "Slug is required");
 
+  // IMPORTANT: use DB column names expected by backend (color_primary/color_accent)
   const themePayload = {
     slug,
     brand_name: $("f-brand_name").value.trim() || null,
     status: $("f-status").value.trim() || null,
     logo_path: $("f-logo_path").value.trim() || null,
     favicon_path: $("f-favicon_path").value.trim() || null,
-    primary_color: $("f-color_primary").value.trim() || null,
-    secondary_color: $("f-color_accent").value.trim() || null,
+    color_primary: $("f-color_primary").value.trim() || null,
+    color_accent:  $("f-color_accent").value.trim() || null,
     color_text: $("f-color_text").value.trim() || null,
     color_muted: $("f-color_muted").value.trim() || null,
     color_border: $("f-color_border").value.trim() || null,
