@@ -1,5 +1,5 @@
 // functions/api/admin/themes/[slug].ts
-import { getCookie, verifyJWT } from "../../_utils/auth";
+import { getCookie, verifyJWT } from "../../../_utils/auth";
 
 async function requireAdmin(env: Env, request: Request) {
   const token = getCookie(request, env.COOKIE_NAME);
