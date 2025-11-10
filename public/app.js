@@ -1,4 +1,5 @@
 // public/app.js
+console.info("PODFY Admin UI v2025-11-10-a");
 
 // ---------- tiny logger ----------
 const LOG = (...a) => console.log("[admin]", ...a);
@@ -64,38 +65,23 @@ function validateList(arr) {
   for (const e of arr) if (!EMAIL_RE.test(e)) return `Invalid email: ${e}`;
   return "";
 }
-
-// Adds a tiny cache-buster to avoid stale 404s or cached redirects
 function withBuster(url) {
   if (!url || !url.trim()) return url;
   return url.includes("?") ? `${url}&v=${Date.now()}` : `${url}?v=${Date.now()}`;
 }
-
 function setBrandingLogo(url) {
   const img = $("branding-logo-preview");
   const code = $("branding-logo-url");
   if (!img || !code) return;
   code.textContent = url || "(none)";
-  if (url && url.trim()) {
-    img.src = withBuster(url);
-    img.style.display = "";
-  } else {
-    img.style.display = "none";
-    img.removeAttribute("src");
-  }
+  if (url && url.trim()) { img.src = withBuster(url); img.style.display = ""; }
+  else { img.style.display = "none"; img.removeAttribute("src"); }
 }
-
-// Header logo in drawer
 function setHeaderLogo(url) {
   const img = $("brand-header-logo");
   if (!img) return;
-  if (url && url.trim()) {
-    img.src = withBuster(url);
-    img.style.display = "";
-  } else {
-    img.style.display = "none";
-    img.removeAttribute("src");
-  }
+  if (url && url.trim()) { img.src = withBuster(url); img.style.display = ""; }
+  else { img.style.display = "none"; img.removeAttribute("src"); }
 }
 
 // ---------- state ----------
@@ -154,7 +140,6 @@ async function doLogout() {
       headers: { "content-type": "application/json" },
     });
   } finally {
-    // hard reload to clear in-memory state
     location.reload();
   }
 }
@@ -166,6 +151,11 @@ function showView(which) {
 }
 
 // ---------- THEMES: data & UI ----------
+const boolIcon = (v) =>
+  Number(v)
+    ? '<span title="On" class="inline-block text-green-600">✓</span>'
+    : '<span title="Off" class="inline-block text-slate-300">–</span>';
+
 async function loadThemes() {
   themes = await api("/api/admin/themes");
   renderThemesTable();
@@ -213,6 +203,11 @@ function renderThemesTable() {
         <span class="inline-block w-4 h-4 rounded align-middle mr-2" style="background:${t.color_accent || "#fff"}"></span>
         <span class="align-middle">${t.color_accent || "—"}</span>
       </td>
+      <td class="p-3 text-center">${boolIcon(t.gps_check)}</td>
+      <td class="p-3 text-center">${boolIcon(t.driver_copy)}</td>
+      <td class="p-3 text-center">${boolIcon(t.issue_report)}</td>
+      <td class="p-3 text-center">${boolIcon(t.mail_notification)}</td>
+      <td class="p-3 text-center">${boolIcon(t.multi_file)}</td>
     `;
     const pillTd = document.createElement("td");
     pillTd.className = "p-3";
@@ -243,7 +238,7 @@ function openEditor(t, creating) {
   current = t || {};
   isNew = !!creating;
 
-  setHeaderLogo(null); // clear while loading
+  setHeaderLogo(null);
 
   $("edit-title").textContent = creating ? "Create theme" : current.brand_name || current.slug || "";
   $("f-slug").value = current.slug || "";
@@ -251,8 +246,7 @@ function openEditor(t, creating) {
 
   $("f-brand_name").value = current.brand_name || "";
   $("f-status").value = current.status || "";
-  $("f-logo_path").value = current.logo_path || "";
-  $("f-favicon_path").value = current.favicon_path || "";
+  $("f-logo").value = current.logo || "";
   $("f-color_primary").value = current.color_primary || "";
   $("f-color_accent").value = current.color_accent || "";
   $("f-color_text").value = current.color_text || "";
@@ -261,6 +255,14 @@ function openEditor(t, creating) {
   $("f-color_button_text").value = current.color_button_text || "";
   $("f-header_bg").value = current.header_bg || "";
   $("f-notes_internal").value = current.notes_internal || "";
+
+  // flags
+  $("f-gps_check").checked         = Number(current.gps_check ?? 1) === 1;
+  $("f-driver_copy").checked       = Number(current.driver_copy ?? 1) === 1;
+  $("f-issue_report").checked      = Number(current.issue_report ?? 1) === 1;
+  $("f-mail_notification").checked = Number(current.mail_notification ?? 1) === 1;
+  $("f-multi_file").checked        = Number(current.multi_file ?? 1) === 1;
+
   $("save-status").textContent = "";
 
   wireColor("f-color_primary", "p-color_primary");
@@ -284,8 +286,8 @@ function openEditor(t, creating) {
       $("f-recip-bcc").value = rec.bcc.join(", ");
 
       const logoUrl = s?.branding?.logo_url ?? null;
-      setBrandingLogo(logoUrl); // preview block
-      setHeaderLogo(logoUrl);   // header avatar
+      setBrandingLogo(logoUrl);
+      setHeaderLogo(logoUrl);
     } catch (e) {
       console.warn("Load settings failed", e);
       setBrandingLogo(null);
@@ -301,13 +303,11 @@ async function saveEdits(e) {
   const slug = $("f-slug").value.trim();
   if (!slug) return ($("save-status").textContent = "Slug is required");
 
-  // IMPORTANT: use DB column names expected by backend (color_primary/color_accent)
   const themePayload = {
     slug,
     brand_name: $("f-brand_name").value.trim() || null,
     status: $("f-status").value.trim() || null,
-    logo_path: $("f-logo_path").value.trim() || null,
-    favicon_path: $("f-favicon_path").value.trim() || null,
+    logo: $("f-logo").value.trim() || null,
     color_primary: $("f-color_primary").value.trim() || null,
     color_accent:  $("f-color_accent").value.trim() || null,
     color_text: $("f-color_text").value.trim() || null,
@@ -316,16 +316,33 @@ async function saveEdits(e) {
     color_button_text: $("f-color_button_text").value.trim() || null,
     header_bg: $("f-header_bg").value.trim() || null,
     notes_internal: $("f-notes_internal").value.trim() || null,
+
+    // flags
+    gps_check:         $("f-gps_check").checked ? 1 : 0,
+    driver_copy:       $("f-driver_copy").checked ? 1 : 0,
+    issue_report:      $("f-issue_report").checked ? 1 : 0,
+    mail_notification: $("f-mail_notification").checked ? 1 : 0,
+    multi_file:        $("f-multi_file").checked ? 1 : 0,
   };
 
   $("save-status").textContent = "Saving…";
   try {
-    if (isNew) await api(`/api/admin/themes`, { method: "POST", body: JSON.stringify(themePayload) });
-    else await api(`/api/admin/themes/${encodeURIComponent(slug)}`, { method: "PUT", body: JSON.stringify(themePayload) });
-  } catch (e) { $("save-status").textContent = "Error saving theme"; console.error(e); return; }
+    if (isNew) {
+      await api(`/api/admin/themes`, { method: "POST", body: JSON.stringify(themePayload) });
+    } else {
+      await api(`/api/admin/themes/${encodeURIComponent(slug)}`, {
+        method: "PUT",
+        body: JSON.stringify(themePayload),
+      });
+    }
+  } catch (e) {
+    $("save-status").textContent = "Error saving theme";
+    console.error(e);
+    return;
+  }
 
-  const to = parseEmails($("f-recip-to").value);
-  const cc = parseEmails($("f-recip-cc").value);
+  const to  = parseEmails($("f-recip-to").value);
+  const cc  = parseEmails($("f-recip-cc").value);
   const bcc = parseEmails($("f-recip-bcc").value);
 
   const vTo = validateList(to), vCc = validateList(cc), vBcc = validateList(bcc);
@@ -338,11 +355,17 @@ async function saveEdits(e) {
 
   try {
     await fetch(`/api/v1/slugs/${encodeURIComponent(slug)}/settings`, {
-      method: "PATCH", credentials: "include", headers: { "content-type": "application/json" },
+      method: "PATCH",
+      credentials: "include",
+      headers: { "content-type": "application/json" },
       body: JSON.stringify({ email_recipients: { to, cc, bcc } }),
     }).then(async (r) => { if (!r.ok) throw new Error(await r.text()); });
     settingsCache.set(slug, { to: to.length, cc: cc.length, bcc: bcc.length });
-  } catch (e) { console.error("Save settings failed", e); $("save-status").textContent = "Error saving recipients"; return; }
+  } catch (e) {
+    console.error("Save settings failed", e);
+    $("save-status").textContent = "Error saving recipients";
+    return;
+  }
 
   $("save-status").textContent = "Saved ✓";
   await loadThemes();
