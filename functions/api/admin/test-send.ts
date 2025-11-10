@@ -1,5 +1,5 @@
 // functions/api/admin/test-send.ts
-import { getCookie, verifyJWT } from "../../../_utils/auth";
+import { getCookie, verifyJWT } from "../../_utils/auth";
 
 type Recipients = { to: string[]; cc: string[]; bcc: string[] };
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
