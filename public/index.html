@@ -7,94 +7,186 @@
       content="width=device-width, initial-scale=1, viewport-fit=cover"
     />
     <title>PODFY Admin</title>
-    <!-- Tailwind (CDN for admin UI) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/assets/favicon.svg" />
+    <style>
+      :root {
+        --bg: #0b1220;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .container {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 24px 20px 64px;
+      }
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        backdrop-filter: saturate(180%) blur(6px);
+        background: rgba(248, 250, 252, 0.8);
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .header-inner {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand {
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+      .spacer {
+        flex: 1;
+      }
+      .btn {
+        appearance: none;
+        border: 0;
+        border-radius: 10px;
+        background: #0f172a;
+        color: #fff;
+        padding: 8px 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn.alt {
+        background: #e5e7eb;
+        color: #0f172a;
+      }
+      .btn.small {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        text-align: left;
+        padding: 12px;
+      }
+      thead th {
+        font-size: 14px;
+        color: #475569;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      tbody td {
+        border-top: 1px solid #e5e7eb;
+      }
+      .input, .textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+      }
+      .label {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 6px;
+      }
+      .pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #f1f5f9; color: #475569;
+        border-radius: 999px; padding: 6px 10px; font-size: 12px;
+      }
+      .modal {
+        position: fixed; inset: 0; display: grid; place-items: center;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 20px;
+      }
+      .modal > .dialog {
+        background: #fff; border-radius: 16px; width: 880px; max-width: 96vw;
+        max-height: 92vh; overflow: auto; border: 1px solid #e5e7eb;
+      }
+      .modal-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 18px 20px; border-bottom: 1px solid #e5e7eb;
+      }
+      .modal-body { padding: 20px; display: grid; gap: 18px; }
+      .color-row { display:flex; align-items:center; gap:12px; }
+      .color-row input[type="color"]{ width:42px; height:36px; border:1px solid #e5e7eb; border-radius:8px; }
+      .switches { display:grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap:12px; }
+      .switch { display:flex; gap:10px; align-items:center; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; }
+      .muted { color:#64748b; font-size:12px; }
+      .avatar { width:24px; height:24px; border-radius:999px; border:1px solid #e5e7eb; display:none; }
+      .grid-actions { display:flex; gap:12px; align-items:center; }
+      .logo-preview { display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:12px; }
+      .sr { position:absolute; left:-9999px; }
+    </style>
   </head>
-  <body class="min-h-screen bg-slate-50 text-slate-900">
-    <header class="bg-white shadow-sm">
-      <div
-        class="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between"
-      >
-        <div class="font-semibold tracking-wide">PODFY Admin</div>
-        <nav class="flex items-center gap-4">
-          <button
-            id="nav-themes"
-            class="px-3 py-1 rounded hover:bg-slate-100 hidden"
-          >
-            Themes
-          </button>
-          <button
-            id="nav-audit"
-            class="px-3 py-1 rounded hover:bg-slate-100 hidden"
-          >
-            Audit
-          </button>
-          <button
-            id="btn-logout"
-            class="px-3 py-1 rounded bg-slate-900 text-white hidden"
-          >
-            Logout
-          </button>
-        </nav>
+  <body>
+    <header class="header">
+      <div class="header-inner">
+        <strong class="brand">PODFY Admin</strong>
+        <div class="spacer"></div>
+        <button id="nav-themes" class="btn alt">Themes</button>
+        <button id="nav-audit" class="btn alt">Audit</button>
+        <button id="btn-logout" class="btn">Logout</button>
       </div>
     </header>
 
-    <main class="mx-auto max-w-5xl p-4">
-      <!-- Login Card -->
-      <section id="view-login" class="mt-10">
-        <div class="mx-auto max-w-md rounded-2xl bg-white shadow p-6 space-y-4">
-          <h1 class="text-xl font-semibold">Sign in</h1>
-          <p class="text-sm text-slate-500">Enter your admin email to start.</p>
-          <input
-            id="login-email"
-            type="email"
-            placeholder="you@podfy.net"
-            class="w-full rounded-lg border p-2"
-          />
-          <button
-            id="btn-login"
-            class="w-full rounded-lg bg-slate-900 text-white p-2 disabled:opacity-50"
-          >
-            Sign in
-          </button>
-          <p id="login-error" class="text-sm text-red-600 hidden"></p>
+    <main class="container">
+      <!-- LOGIN VIEW -->
+      <section id="view-login" class="card" style="max-width:460px; margin:48px auto; padding:20px;">
+        <h2 style="margin:0 0 12px 0;">Sign in</h2>
+        <p class="muted" style="margin-top:0;">Admin email only</p>
+        <div class="label">Email</div>
+        <input id="login-email" class="input" type="email" autocomplete="username" />
+        <div id="login-error" class="muted hidden" style="margin-top:8px;"></div>
+        <div style="margin-top:12px;">
+          <button id="btn-login" class="btn">Sign in</button>
         </div>
       </section>
 
-      <!-- Themes List -->
+      <!-- THEMES VIEW -->
       <section id="view-themes" class="hidden">
-        <div
-          class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <h2 class="text-xl font-semibold">Themes</h2>
-          <div class="flex items-center gap-2">
-            <input
-              id="search"
-              type="search"
-              placeholder="Search slug, brand…"
-              class="w-64 rounded-lg border p-2"
-            />
-            <button
-              id="btn-create"
-              class="rounded-lg bg-slate-900 text-white px-3 py-2"
-            >
-              Create theme
-            </button>
-          </div>
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+          <div id="theme-count" class="muted">0 themes</div>
+          <div class="spacer"></div>
+          <input id="search" class="input" placeholder="Search slug, brand..." style="max-width:420px;" />
+          <button id="btn-create" class="btn">Create theme</button>
         </div>
 
-        <div class="text-sm text-slate-500 mb-2" id="theme-count"></div>
-
-        <div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
-          <table class="min-w-full text-sm" id="themes-table">
-            <thead class="bg-slate-50 text-left">
+        <div class="card">
+          <table>
+            <thead>
               <tr>
-                <th class="p-3">Slug ▲</th>
-                <th class="p-3">Brand</th>
-                <th class="p-3">Primary</th>
-                <th class="p-3">Accent</th>
-                <th class="p-3">Recipients</th>
-                <th class="p-3 w-1">Edit</th>
+                <th>Slug</th>
+                <th>Brand</th>
+                <th>Primary</th>
+                <th>Accent</th>
+                <th>Recipients</th>
+                <th>Flags</th>
+                <th>Edit</th>
               </tr>
             </thead>
             <tbody id="themes-tbody"></tbody>
@@ -102,313 +194,173 @@
         </div>
       </section>
 
-      <!-- Audit View -->
+      <!-- AUDIT VIEW -->
       <section id="view-audit" class="hidden">
-        <div
-          class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <h2 class="text-xl font-semibold">Audit</h2>
-          <div class="flex items-center gap-2">
-            <div class="rounded-lg border bg-white p-1 flex">
-              <button
-                id="audit-type-admin"
-                class="px-3 py-1 rounded bg-slate-900 text-white"
-              >
-                Admin
-              </button>
-              <button
-                id="audit-type-user"
-                class="px-3 py-1 rounded hover:bg-slate-100"
-              >
-                User
-              </button>
-            </div>
-            <input
-              id="audit-search"
-              type="search"
-              placeholder="Search action, target, email…"
-              class="w-72 rounded-lg border p-2"
-            />
+        <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
+          <div class="grid-actions">
+            <button id="audit-type-admin" class="btn small alt">Admin</button>
+            <button id="audit-type-user"  class="btn small alt">User</button>
           </div>
+          <div class="spacer"></div>
+          <input id="audit-search" class="input" placeholder="Search actor, action, target..." style="max-width:420px;" />
+          <button id="audit-more" class="btn small alt" disabled>Load more</button>
         </div>
-
-        <div class="overflow-x-auto rounded-xl border bg-white shadow-sm">
-          <table class="min-w-full text-sm">
-            <thead class="bg-slate-50 text-left">
+        <div class="card">
+          <table>
+            <thead>
               <tr>
-                <th class="p-3">Time</th>
-                <th class="p-3">Actor</th>
-                <th class="p-3">Action</th>
-                <th class="p-3">Target</th>
-                <th class="p-3">Payload</th>
+                <th style="width:160px;">When</th>
+                <th style="width:200px;">Actor</th>
+                <th style="width:160px;">Action</th>
+                <th style="width:200px;">Target</th>
+                <th>Payload</th>
               </tr>
             </thead>
             <tbody id="audit-tbody"></tbody>
           </table>
         </div>
-
-        <div class="flex justify-between items-center mt-3">
-          <div class="text-sm text-slate-500" id="audit-status">
-            Newest first
-          </div>
-          <button
-            id="audit-more"
-            class="rounded-lg border px-3 py-2 bg-white hover:bg-slate-50"
-          >
-            Load more
-          </button>
-        </div>
+        <div id="audit-status" class="muted" style="margin-top:8px;"></div>
       </section>
     </main>
 
-    <!-- Edit Drawer / Modal -->
-    <div id="edit-modal" class="fixed inset-0 z-50 hidden">
-      <div class="absolute inset-0 bg-black/40"></div>
-      <div
-        class="absolute right-0 top-0 h-full w-full sm:w-[560px] bg-white shadow-xl overflow-y-auto"
-      >
-        <div class="p-4 border-b flex items-center justify-between">
-          <!-- Drawer header with brand logo -->
-          <div class="flex items-center gap-3">
-            <h3 id="edit-title" class="text-lg font-semibold text-slate-900">
-              Edit theme
-            </h3>
+    <!-- EDIT MODAL -->
+    <section id="edit-modal" class="modal hidden" aria-modal="true" role="dialog">
+      <div class="dialog">
+        <div class="modal-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img id="brand-header-logo" class="avatar" alt="">
+            <strong id="edit-title">Edit theme</strong>
           </div>
-          <img
-            id="brand-header-logo"
-            alt="Brand logo"
-            class="h-10 w-10 rounded bg-white object-contain border shadow-sm p-1"
-            style="display:none"
-          />
-          <button id="btn-close" class="p-2 rounded hover:bg-slate-100">✕</button>
+          <button id="btn-close" class="btn small alt">Close</button>
         </div>
-
-        <form id="edit-form" class="p-4 space-y-3">
-          <!-- Slug -->
-          <label class="block">
-            <span class="text-sm text-slate-600">Slug</span>
-            <input id="f-slug" class="w-full rounded border p-2 bg-white" />
-          </label>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="block">
-              <span class="text-sm text-slate-600">Brand name</span>
-              <input id="f-brand_name" class="w-full rounded border p-2" />
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Status</span>
-              <input id="f-status" class="w-full rounded border p-2" />
-            </label>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="block">
-              <span class="text-sm text-slate-600">Logo path</span>
-              <input id="f-logo_path" class="w-full rounded border p-2" />
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Favicon path</span>
-              <input id="f-favicon_path" class="w-full rounded border p-2" />
-            </label>
-          </div>
-
-          <!-- Colors -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <label class="block">
-              <span class="text-sm text-slate-600">Primary color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_primary"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_primary"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#111827"
-                />
+        <form id="edit-form">
+          <div class="modal-body">
+            <div class="row">
+              <div>
+                <div class="label">Slug</div>
+                <input id="f-slug" class="input" />
               </div>
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Accent color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_accent"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_accent"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#06b6d4"
-                />
-              </div>
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Text color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_text"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_text"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#0B1220"
-                />
-              </div>
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Muted color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_muted"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_muted"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#6B7280"
-                />
-              </div>
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Border color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_border"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_border"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#E5E7EB"
-                />
-              </div>
-            </label>
-            <label class="block">
-              <span class="text-sm text-slate-600">Button text color</span>
-              <div class="flex items-center gap-2">
-                <input
-                  id="p-color_button_text"
-                  type="color"
-                  class="h-10 w-10 rounded border"
-                />
-                <input
-                  id="f-color_button_text"
-                  class="flex-1 rounded border p-2"
-                  placeholder="#FFFFFF"
-                />
-              </div>
-            </label>
-          </div>
-
-          <label class="block">
-            <span class="text-sm text-slate-600">Header background</span>
-            <input
-              id="f-header_bg"
-              class="w-full rounded border p-2"
-              placeholder="#FFFFFF"
-            />
-          </label>
-
-          <!-- Recipients -->
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-sm text-slate-600 font-medium">Recipients</span>
-              <div class="flex items-center gap-2">
-                <button
-                  id="btn-refresh-logo"
-                  type="button"
-                  class="text-xs rounded border px-2 py-1 hover:bg-slate-50"
-                >
-                  Fetch logo from podfy.app
-                </button>
-                <button
-                  id="btn-test-send"
-                  type="button"
-                  class="text-xs rounded border px-2 py-1 hover:bg-slate-50"
-                >
-                  Test send
-                </button>
+              <div>
+                <div class="label">Status</div>
+                <input id="f-status" class="input" />
               </div>
             </div>
 
-            <label class="block">
-              <span class="text-sm text-slate-600">To (required)</span>
-              <textarea
-                id="f-recip-to"
-                class="w-full rounded border p-2"
-                rows="2"
-                placeholder="one or more emails, comma/space separated"
-              ></textarea>
-              <span id="err-to" class="hidden text-xs text-red-600"></span>
-            </label>
-
-            <label class="block">
-              <span class="text-sm text-slate-600">CC (optional)</span>
-              <textarea
-                id="f-recip-cc"
-                class="w-full rounded border p-2"
-                rows="2"
-                placeholder="comma/space separated"
-              ></textarea>
-              <span id="err-cc" class="hidden text-xs text-red-600"></span>
-            </label>
-
-            <label class="block">
-              <span class="text-sm text-slate-600">BCC (optional)</span>
-              <textarea
-                id="f-recip-bcc"
-                class="w-full rounded border p-2"
-                rows="2"
-                placeholder="comma/space separated"
-              ></textarea>
-              <span id="err-bcc" class="hidden text-xs text-red-600"></span>
-            </label>
-          </div>
-
-          <!-- Branding preview -->
-          <div class="rounded-lg border bg-slate-50 p-3">
-            <div class="text-sm text-slate-600 mb-2">Branding</div>
-            <div class="flex items-center gap-3">
-              <img
-                id="branding-logo-preview"
-                alt="Brand logo preview"
-                class="h-12 w-12 rounded bg-white object-contain border shadow-sm p-1"
-                style="display:none"
-              />
-              <code
-                id="branding-logo-url"
-                class="text-xs text-slate-600 break-all"
-                >(none)</code
-              >
+            <div>
+              <div class="label">Brand name</div>
+              <input id="f-brand_name" class="input" />
             </div>
-          </div>
 
-          <label class="block">
-            <span class="text-sm text-slate-600">Internal notes</span>
-            <textarea
-              id="f-notes_internal"
-              class="w-full rounded border p-2"
-              rows="3"
-            ></textarea>
-          </label>
+            <div class="row">
+              <div>
+                <div class="label">Primary color</div>
+                <div class="color-row">
+                  <input id="p-color_primary" type="color" />
+                  <input id="f-color_primary" class="input" placeholder="#000000" />
+                </div>
+              </div>
+              <div>
+                <div class="label">Accent color</div>
+                <div class="color-row">
+                  <input id="p-color_accent" type="color" />
+                  <input id="f-color_accent" class="input" placeholder="#111111" />
+                </div>
+              </div>
+            </div>
 
-          <div class="pt-2 flex items-center gap-3">
-            <button id="btn-save" class="rounded-lg bg-slate-900 text-white px-4 py-2">
-              Save
-            </button>
-            <span id="save-status" class="text-sm text-slate-500"></span>
+            <div class="row-3">
+              <div>
+                <div class="label">Text color</div>
+                <div class="color-row">
+                  <input id="p-color_text" type="color" />
+                  <input id="f-color_text" class="input" placeholder="#0B1220" />
+                </div>
+              </div>
+              <div>
+                <div class="label">Muted color</div>
+                <div class="color-row">
+                  <input id="p-color_muted" type="color" />
+                  <input id="f-color_muted" class="input" placeholder="#6B7280" />
+                </div>
+              </div>
+              <div>
+                <div class="label">Border color</div>
+                <div class="color-row">
+                  <input id="p-color_border" type="color" />
+                  <input id="f-color_border" class="input" placeholder="#E5E7EB" />
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <div class="label">Button text color</div>
+                <div class="color-row">
+                  <input id="p-color_button_text" type="color" />
+                  <input id="f-color_button_text" class="input" placeholder="#111111" />
+                </div>
+              </div>
+              <div>
+                <div class="label">Header background</div>
+                <input id="f-header_bg" class="input" placeholder="#FFFFFF" />
+              </div>
+            </div>
+
+            <!-- NEW: Boolean flags -->
+            <div>
+              <div class="label">Flags</div>
+              <div class="switches">
+                <label class="switch"><input id="f-gps_check" type="checkbox" /> GPS check</label>
+                <label class="switch"><input id="f-driver_copy" type="checkbox" /> Driver copy</label>
+                <label class="switch"><input id="f-issue_report" type="checkbox" /> Issue report</label>
+                <label class="switch"><input id="f-mail_notification" type="checkbox" /> Mail notifications</label>
+                <label class="switch"><input id="f-multi_file" type="checkbox" /> Multi-file upload</label>
+              </div>
+            </div>
+
+            <!-- Recipients + branding -->
+            <div>
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
+                <div class="label" style="margin:0;">Recipients</div>
+                <div class="spacer"></div>
+                <button id="btn-refresh-logo" type="button" class="btn small alt">Fetch logo from podfy.app</button>
+                <button id="btn-test-send"   type="button" class="btn small alt">Test send</button>
+              </div>
+
+              <div class="label">To (required)</div>
+              <textarea id="f-recip-to" class="textarea" rows="2" placeholder="comma/space separated"></textarea>
+              <div id="err-to" class="muted hidden"></div>
+
+              <div class="label" style="margin-top:8px;">CC (optional)</div>
+              <textarea id="f-recip-cc" class="textarea" rows="2" placeholder="comma/space separated"></textarea>
+              <div id="err-cc" class="muted hidden"></div>
+
+              <div class="label" style="margin-top:8px;">BCC (optional)</div>
+              <textarea id="f-recip-bcc" class="textarea" rows="2" placeholder="comma/space separated"></textarea>
+              <div id="err-bcc" class="muted hidden"></div>
+
+              <div class="label" style="margin-top:10px;">Branding</div>
+              <div class="logo-preview">
+                <img id="branding-logo-preview" alt="" style="height:28px; display:none;" />
+                <code id="branding-logo-url" style="font-size:12px; color:#475569;">(none)</code>
+              </div>
+            </div>
+
+            <div>
+              <div class="label">Internal notes</div>
+              <textarea id="f-notes_internal" class="textarea" rows="4"></textarea>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div id="save-status" class="muted"></div>
+              <div class="spacer"></div>
+              <button class="btn" type="submit">Save</button>
+            </div>
           </div>
         </form>
       </div>
-    </div>
+    </section>
 
-    <!-- Single app script -->
     <script src="/app.js" defer></script>
   </body>
-</html> 
+</html>
