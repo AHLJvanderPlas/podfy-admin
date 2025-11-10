@@ -96,8 +96,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
   if (!admin) return new Response("Unauthorized", { status: 401 });
 
   try {
-    const { results = [] } = await env.DB.prepare("SELECT * FROM themes").all();
-    // Sort by slug ASC for the grid
+  const { results = [] } = await env.DB.prepare("SELECT * FROM slug_details").all();    // Sort by slug ASC for the grid
     const list = (results as any[]).sort((a, b) =>
       String(a.slug || "").localeCompare(String(b.slug || ""))
     );
