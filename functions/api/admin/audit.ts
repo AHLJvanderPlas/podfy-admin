@@ -1,5 +1,5 @@
 // functions/api/admin/audit.ts
-import { getCookie, verifyJWT } from "../../../_utils/auth";
+import { getCookie, verifyJWT } from "../../_utils/auth";
 
 function ok(data: any, status = 200) {
   return new Response(JSON.stringify(data), {
